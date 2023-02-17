@@ -1,18 +1,22 @@
 #include <stdio.h>
+#include <ctype.h>
 /**
- * main - Entry point
- * Description - Smile in which mirror?
- * Return: 0
+ * main - prints lower case alphabets in reverse
+ *
+ * Return: 0, if succesful
  */
 int main(void)
 {
-	int i;
+	char rv;
 
-	for (i = 'z'; i >= 'a'; i--)
+	/*
+	 * loops through the alphabets from behind
+	 * to print alphabets in reverse
+	 */
+	for (rv = 'z' ; rv >= 'a' ; rv--)
 	{
-		putchar(i);
+		putchar(rv);
 	}
 	putchar('\n');
-
 	return (0);
-}
+}}
