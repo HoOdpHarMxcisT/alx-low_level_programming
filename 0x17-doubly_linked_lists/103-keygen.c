@@ -2,44 +2,125 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 /**
- * main - generate a key depending on a username for crackme5
- * @argc: number of arguments passed
- * @argv: arguments passed to main
- *
- * Return: 0 on success, 1 on error
+ * f23 - gets second or third index of key
+ * @username: username
+ * @len: length of username
+ * @x: sets index to 2 or 3
+ * Return: encrypted character
  */
-int main(int argc, char *argv[])
+int f23(char *username, int len, int x)
 {
-	unsigned int i, b;
-	size_t len, add;
-	char *l = "A-CHRDw87lNS0E9B2TibgpnMVys5XzvtOGJcYLU+4mjW6fxqZeF3Qa1rPhdKIouk";
-	char p[7] = "      ";
+	int temp, i = 0, hex;
+
+	if (x == 2)
+	{
+		temp = 0;
+		hex = 0x4f;
+		while (i < len)
+		{
+			temp += username[i];
+			i++;
+		}
+	}
+	else
+	{
+		temp = 1;
+		hex = 0x55;
+		while (i < len)
+		{
+			temp *= username[i];
+			i++;
+		}
+	}
+	return ((temp ^ hex) & 0x3f);
+}
+
+
+/**
+ * f4 - gets fourth index of key
+ * @username: username
+ * @len: length of username
+ * Return: encrypted character
+ */
+int f4(char *username, int len)
+{
+	int temp = username[0], i = 0;
+
+	while (i < len)
+	{
+		if (temp < username[i])
+			temp = username[i];
+		i++;
+	}
+	srand(temp ^ 0xe);
+	return (rand() & 0x3f);
+}
+
+
+/**
+ * f5 - gets fifth index of key
+ * @username: username
+ * @len: length of username
+ * Return: encrypted character
+ */
+int f5(char *username, int len)
+{
+	int temp = 0, i = 0;
+
+	while (i < len)
+	{
+		temp += username[i] * username[i];
+		i++;
+	}
+	return ((temp ^ 0xef) & 0x3f);
+}
+
+
+/**
+ * f6 - gets sixth index of key
+ * @c: first character of username
+ * Return: encrypted character
+ */
+int f6(char c)
+{
+	int temp = 0, i = 0;
+
+	while (c > i)
+	{
+		temp = rand();
+		i++;
+	}
+	return ((temp ^ 0xe5) & 0x3f);
+}
+
+
+/**
+ * main - entry point
+ * @argc: number of arguments
+ * @argv: 2d array of arguments
+ * Return: 1 if arguments correct, 0 otherwise
+ */
+int main(int argc, char **argv)
+{
+	char password[7];
+	char *username = argv[1];
+	char key[] =
+		"A-CHRDw87lNS0E9B2TibgpnMVys5XzvtOGJcYLU+4mjW6fxqZeF3Qa1rPhdKIouk";
+	int len = strlen(username);
+	int temp = 0;
 
 	if (argc != 2)
-	{
-		printf("Correct usage: ./keygen5 username\n");
 		return (1);
-	}
-	len = strlen(argv[1]);
-	p[0] = l[(len ^ 59) & 63];
-	for (i = 0, add = 0; i < len; i++)
-		add += argv[1][i];
-	p[1] = l[(add ^ 79) & 63];
-	for (i = 0, b = 1; i < len; i++)
-		b *= argv[1][i];
-	p[2] = l[(b ^ 85) & 63];
-	for (b = argv[1][0], i = 0; i < len; i++)
-		if ((char)b <= argv[1][i])
-			b = argv[1][i];
-	srand(b ^ 14);
-	p[3] = l[rand() & 63];
-	for (b = 0, i = 0; i < len; i++)
-		b += argv[1][i] * argv[1][i];
-	p[4] = l[(b ^ 239) & 63];
-	for (b = 0, i = 0; (char)i < argv[1][0]; i++)
-		b = rand();
-	p[5] = l[(b ^ 229) & 63];
-	printf("%s\n", p);
+
+	password[0] = key[(temp = (len ^ 0x3b) & 0x3f)];
+	password[1] = key[(temp = f23(username, len, 2))];
+	password[2] = key[(temp = f23(username, len, 3))];
+	password[3] = key[(temp = f4(username, len))];
+	password[4] = key[(temp = f5(username, len))];
+	password[5] = key[(temp = f6(username[0]))];
+	password[6] = '\0';
+	printf("%s", password);
 	return (0);
 }
